@@ -446,16 +446,129 @@
     color: var(--dark); min-width: 50px; text-align: center;
   }
 
-  body.disco { animation: discoFlash 0.25s linear infinite; }
+  body.disco { animation: discoFlash 0.3s linear infinite; }
   @keyframes discoFlash {
-    0%   { background: #FFF8E7; }
-    16%  { background: #FFE0F0; }
-    33%  { background: #E0F0FF; }
-    50%  { background: #E0FFE0; }
-    66%  { background: #FFF0E0; }
-    83%  { background: #F0E0FF; }
-    100% { background: #FFF8E7; }
+    0%   { background: #1a001a; }
+    14%  { background: #001a00; }
+    28%  { background: #00001a; }
+    42%  { background: #1a0a00; }
+    56%  { background: #1a001a; }
+    70%  { background: #000d1a; }
+    85%  { background: #0d001a; }
+    100% { background: #1a001a; }
   }
+
+  /* ── DISCO LIGHT OVERLAY ── */
+  #discoOverlay {
+    position: fixed; inset: 0; z-index: 8;
+    pointer-events: none; overflow: hidden;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  #discoOverlay.active { opacity: 1; }
+
+  /* Spinning spotlight beams */
+  .spotlight {
+    position: absolute;
+    width: 0; height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 100vh solid rgba(255,255,255,0.06);
+    top: -10px; left: 50%;
+    transform-origin: top center;
+  }
+  .spotlight:nth-child(1) { animation: spinLight1 2s linear infinite; filter: hue-rotate(0deg); border-bottom-color: rgba(255,60,60,0.08); }
+  .spotlight:nth-child(2) { animation: spinLight2 3s linear infinite; filter: hue-rotate(120deg); border-bottom-color: rgba(60,255,60,0.08); }
+  .spotlight:nth-child(3) { animation: spinLight3 2.5s linear infinite; filter: hue-rotate(240deg); border-bottom-color: rgba(60,60,255,0.08); }
+  .spotlight:nth-child(4) { animation: spinLight4 1.8s linear infinite; border-bottom-color: rgba(255,255,60,0.07); }
+  .spotlight:nth-child(5) { animation: spinLight5 2.2s linear infinite; border-bottom-color: rgba(255,60,255,0.07); }
+
+  @keyframes spinLight1 { 0%{transform:rotate(-30deg)} 100%{transform:rotate(330deg)} }
+  @keyframes spinLight2 { 0%{transform:rotate(60deg)} 100%{transform:rotate(420deg)} }
+  @keyframes spinLight3 { 0%{transform:rotate(-120deg)} 100%{transform:rotate(240deg)} }
+  @keyframes spinLight4 { 0%{transform:rotate(20deg)} 100%{transform:rotate(380deg)} }
+  @keyframes spinLight5 { 0%{transform:rotate(-60deg)} 100%{transform:rotate(-420deg)} }
+
+  /* Mirror ball flashes — small colored dots flying around */
+  .disco-dot {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9;
+    animation: discoDotMove linear forwards;
+  }
+  @keyframes discoDotMove {
+    0%   { opacity: 0.9; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
+  }
+
+  /* Mirror ball itself */
+  .mirror-ball {
+    position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 80px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%,
+      #fff 0%, #ddd 20%, #aaa 40%, #666 70%, #333 100%);
+    box-shadow:
+      0 0 20px rgba(255,255,255,0.8),
+      inset -8px -8px 20px rgba(0,0,0,0.5);
+    z-index: 9;
+    pointer-events: none;
+    opacity: 0; transition: top 0.8s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+    animation: mirrorSpin 3s linear infinite;
+    /* grid lines for mirror ball look */
+    background-image:
+      radial-gradient(circle at 35% 35%, #fff 0%, #ccc 30%, #888 60%, #444 100%),
+      repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px),
+      repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px);
+  }
+  .mirror-ball.visible { top: 10px; opacity: 1; }
+  @keyframes mirrorSpin {
+    from { transform: translateX(-50%) rotate(0deg); }
+    to   { transform: translateX(-50%) rotate(360deg); }
+  }
+
+  /* Disco floor grid */
+  .disco-floor {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 180px; z-index: 7; pointer-events: none;
+    opacity: 0; transition: opacity 0.5s;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 40px);
+    animation: floorPulse 0.3s linear infinite;
+  }
+  .disco-floor.visible { opacity: 1; }
+  @keyframes floorPulse {
+    0%   { background-color: rgba(255,0,100,0.04); }
+    16%  { background-color: rgba(0,255,100,0.04); }
+    33%  { background-color: rgba(0,100,255,0.04); }
+    50%  { background-color: rgba(255,200,0,0.04); }
+    66%  { background-color: rgba(200,0,255,0.04); }
+    83%  { background-color: rgba(0,200,255,0.04); }
+    100% { background-color: rgba(255,0,100,0.04); }
+  }
+
+  /* 🔊 Music note indicator */
+  .music-note {
+    position: fixed; z-index: 300;
+    font-size: 1.4rem; pointer-events: none;
+    animation: noteFloat 1.2s ease-out forwards;
+  }
+  @keyframes noteFloat {
+    0%   { opacity: 1; transform: translateY(0) rotate(-10deg) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) rotate(20deg) scale(1.5); }
+  }
+
+  /* Mute button */
+  .mute-btn {
+    position: fixed; bottom: 24px; right: 20px; z-index: 400;
+    background: var(--dark); color: var(--yolk);
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 8px 18px; border-radius: 50px;
+    border: 2px solid var(--yolk); cursor: pointer;
+    box-shadow: 3px 3px 0 var(--orange);
+    transition: all 0.15s;
+  }
+  .mute-btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--orange); }
 
   /* Naked shame banner */
   .shame-banner {
@@ -484,6 +597,24 @@
 <body>
 
 <div id="feathers"></div>
+
+<!-- Disco overlay with spinning spotlights -->
+<div id="discoOverlay">
+  <div class="spotlight"></div>
+  <div class="spotlight"></div>
+  <div class="spotlight"></div>
+  <div class="spotlight"></div>
+  <div class="spotlight"></div>
+</div>
+
+<!-- Mirror ball -->
+<div class="mirror-ball" id="mirrorBall"></div>
+
+<!-- Disco floor grid -->
+<div class="disco-floor" id="discoFloor"></div>
+
+<!-- Mute button -->
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊 Mute</button>
 
 <div class="hud">
   <div class="mood-bar"><span class="mood-emoji" id="moodEmoji">😐</span> <span id="moodText">Neutral</span></div>
@@ -1026,16 +1157,24 @@ function spawnTears() {
 // ── Disco with feather shedding ──
 function toggleDisco() {
   if (discoMode) {
-    // Stop disco, regrow feathers
     discoMode = false;
     document.body.classList.remove('disco');
     chicken.classList.remove('disco');
     chicken.style.animation = 'chickenDance 0.6s ease-in-out infinite';
     if (discoTimeout)  clearTimeout(discoTimeout);
     if (featherInterval) clearInterval(featherInterval);
-    featherInterval = null;
+    if (discoDotInterval) clearInterval(discoDotInterval);
+    if (musicNoteInterval) clearInterval(musicNoteInterval);
+    featherInterval = null; discoDotInterval = null; musicNoteInterval = null;
 
-    // Regrow feathers
+    // Hide disco visuals
+    document.getElementById('discoOverlay').classList.remove('active');
+    document.getElementById('mirrorBall').classList.remove('visible');
+    document.getElementById('discoFloor').classList.remove('visible');
+
+    // Stop music
+    stopDiscoMusic();
+
     regrowFeathers();
     moodEmoji.textContent = '😅';
     moodText.textContent = 'Relieved';
@@ -1053,30 +1192,34 @@ function toggleDisco() {
     moodEmoji.textContent = '🕺';
     moodText.textContent = 'GROOVING';
 
+    // Show disco visuals
+    document.getElementById('discoOverlay').classList.add('active');
+    document.getElementById('mirrorBall').classList.add('visible');
+    document.getElementById('discoFloor').classList.add('visible');
+
+    // Spawn mirror ball light dots
+    discoDotInterval = setInterval(spawnDiscoDots, 120);
+
+    // Floating music notes
+    musicNoteInterval = setInterval(spawnMusicNote, 400);
+
+    // Start music
+    startDiscoMusic();
+
     const phrase = reactions.dance.phrases[Math.floor(Math.random() * reactions.dance.phrases.length)];
     showBubble(phrase);
     spawnParticles(reactions.dance.particles);
 
-    // Shed a feather layer every ~1.2 seconds during disco (4 layers = ~4.8s)
     let shedCount = 0;
     featherInterval = setInterval(() => {
       if (!discoMode) { clearInterval(featherInterval); return; }
-      // Spawn lots of falling feathers
-      for (let i = 0; i < 6; i++) {
-        setTimeout(spawnFallingFeather, i * 100);
-      }
+      for (let i = 0; i < 6; i++) setTimeout(spawnFallingFeather, i * 100);
       shedNextFeatherLayer();
       shedCount++;
-      if (shedCount >= FEATHER_LAYERS.length) {
-        clearInterval(featherInterval);
-        featherInterval = null;
-      }
+      if (shedCount >= FEATHER_LAYERS.length) { clearInterval(featherInterval); featherInterval = null; }
     }, 1200);
 
-    // Auto-stop disco after 6 seconds
-    discoTimeout = setTimeout(() => {
-      if (discoMode) toggleDisco();
-    }, 6500);
+    discoTimeout = setTimeout(() => { if (discoMode) toggleDisco(); }, 6500);
   }
 }
 
@@ -1127,6 +1270,459 @@ for (let i = 0; i < 12; i++) {
   f.style.fontSize = (14 + Math.random()*16) + 'px';
   document.getElementById('feathers').appendChild(f);
 }
+
+// Disco interval handles
+let discoDotInterval = null;
+let musicNoteInterval = null;
+let isMuted = false;
+
+function toggleMute() {
+  isMuted = !isMuted;
+  document.getElementById('muteBtn').textContent = isMuted ? '🔇 Unmute' : '🔊 Mute';
+  if (audioCtx) {
+    if (isMuted) audioCtx.suspend(); else audioCtx.resume();
+  }
+}
+
+// Spawn coloured mirror-ball reflection dots
+function spawnDiscoDots() {
+  const colors = ['#FF2D55','#FF9500','#FFD000','#34C759','#007AFF','#AF52DE','#FF375F','#00C7BE'];
+  const count = 4 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'disco-dot';
+    const size = 6 + Math.random() * 14;
+    el.style.cssText = `
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:${Math.random()*100}vw;
+      top:${Math.random()*80}vh;
+      box-shadow: 0 0 ${size}px ${colors[Math.floor(Math.random()*colors.length)]};
+      --tx:${(Math.random()-0.5)*200}px;
+      --ty:${(Math.random()-0.5)*200}px;
+      animation-duration:${0.4+Math.random()*0.8}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1300);
+  }
+}
+
+// Floating music notes from random positions
+function spawnMusicNote() {
+  const notes = ['🎵','🎶','🎸','🎹','🎺','🎻','🥁'];
+  const el = document.createElement('div');
+  el.className = 'music-note';
+  el.textContent = notes[Math.floor(Math.random()*notes.length)];
+  el.style.left = (10 + Math.random()*80) + 'vw';
+  el.style.bottom = (10 + Math.random()*40) + 'vh';
+  el.style.animationDuration = (0.8+Math.random()*0.6)+'s';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+// ══════════════════════════════════════════
+// 🔊 SOUND ENGINE — Web Audio API, no files
+// ══════════════════════════════════════════
+let audioCtx = null;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Core helpers
+function playTone(freq, type, duration, vol=0.3, startTime=null) {
+  const ctx = getCtx();
+  const t = startTime ?? ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = type; osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+  osc.start(t); osc.stop(t + duration);
+}
+
+function playFreqRamp(freqStart, freqEnd, type, duration, vol=0.3, startTime=null) {
+  const ctx = getCtx();
+  const t = startTime ?? ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freqStart, t);
+  osc.frequency.exponentialRampToValueAtTime(freqEnd, t + duration);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+  osc.start(t); osc.stop(t + duration);
+}
+
+function playNoise(duration, vol=0.15, startTime=null) {
+  const ctx = getCtx();
+  const t = startTime ?? ctx.currentTime;
+  const bufSize = ctx.sampleRate * duration;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  src.buffer = buf; src.connect(gain); gain.connect(ctx.destination);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+  src.start(t); src.stop(t + duration);
+}
+
+// ── Per-action sounds ──
+
+function soundPunch() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Thud impact
+  playNoise(0.12, 0.4, t);
+  playFreqRamp(180, 40, 'sine', 0.18, 0.5, t);
+  // Dizzy wobbly tone after
+  setTimeout(() => {
+    playFreqRamp(600, 300, 'sine', 0.4, 0.12);
+    playFreqRamp(500, 250, 'sine', 0.4, 0.1);
+  }, 200);
+  // Chicken BWAK squawk
+  setTimeout(() => soundBwak(1.0), 80);
+}
+
+function soundHit() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Slap + squish
+  playNoise(0.08, 0.5, t);
+  playFreqRamp(300, 80, 'sawtooth', 0.15, 0.3, t);
+  playFreqRamp(250, 60, 'sine', 0.2, 0.25, t + 0.05);
+  setTimeout(() => soundBwak(0.9), 60);
+}
+
+function soundBwak(pitch = 1.0) {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Classic chicken cluck: fast freq sweep
+  const base = 800 * pitch;
+  playFreqRamp(base, base * 1.8, 'sawtooth', 0.08, 0.25, t);
+  playFreqRamp(base * 1.8, base * 0.6, 'sawtooth', 0.12, 0.2, t + 0.07);
+  playFreqRamp(base * 0.6, base * 1.2, 'sawtooth', 0.1, 0.15, t + 0.17);
+  // Nasal honk layer
+  playFreqRamp(base * 0.5, base * 0.3, 'square', 0.15, 0.08, t + 0.05);
+}
+
+function soundKiss() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Mwah! — rising then pop
+  playFreqRamp(400, 800, 'sine', 0.1, 0.2, t);
+  playFreqRamp(800, 1200, 'sine', 0.08, 0.15, t + 0.09);
+  playTone(1200, 'sine', 0.05, 0.25, t + 0.16);
+  // Little heart flutter
+  playFreqRamp(600, 900, 'triangle', 0.12, 0.12, t + 0.22);
+  playFreqRamp(900, 600, 'triangle', 0.08, 0.1,  t + 0.33);
+  setTimeout(() => soundBwak(1.3), 250);
+}
+
+function soundHug() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Warm cozy squeeze — low soft chord
+  playTone(261, 'sine', 0.5, 0.18, t);       // C
+  playTone(329, 'sine', 0.5, 0.18, t + 0.05); // E
+  playTone(392, 'sine', 0.5, 0.18, t + 0.1);  // G
+  // Gentle bwak
+  setTimeout(() => soundBwak(0.7), 300);
+}
+
+function soundPinch() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // High-pitched squeak
+  playFreqRamp(1200, 2200, 'sawtooth', 0.06, 0.3, t);
+  playFreqRamp(2200, 800,  'sawtooth', 0.08, 0.2, t + 0.06);
+  playFreqRamp(1000, 1800, 'square',   0.05, 0.07, t + 0.12);
+  // Crying whimper
+  setTimeout(() => {
+    playFreqRamp(500, 300, 'sine', 0.3, 0.15);
+    playFreqRamp(300, 200, 'sine', 0.3, 0.12);
+  }, 200);
+  setTimeout(() => soundBwak(1.5), 350);
+}
+
+function soundDisco() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Funky wah-wah bass
+  const notes = [130, 165, 196, 220, 196, 165, 130, 110];
+  notes.forEach((freq, i) => {
+    playTone(freq, 'sawtooth', 0.13, 0.22, t + i * 0.13);
+    playTone(freq * 2, 'square', 0.13, 0.06, t + i * 0.13, 0.08);
+  });
+  // Hi-hat style noise bursts
+  for (let i = 0; i < 8; i++) playNoise(0.04, 0.06, t + i * 0.13);
+  // Proud bwak
+  setTimeout(() => soundBwak(1.1), 200);
+}
+
+// ── DISCO MUSIC — full looping track ──
+let discoMusicNodes = [];
+let discoMusicLoop = null;
+
+function startDiscoMusic() {
+  if (isMuted) return;
+  stopDiscoMusic();
+  playDiscoLoop();
+}
+
+function stopDiscoMusic() {
+  discoMusicNodes.forEach(n => { try { n.stop(); } catch(e){} });
+  discoMusicNodes = [];
+  if (discoMusicLoop) { clearTimeout(discoMusicLoop); discoMusicLoop = null; }
+}
+
+function playDiscoLoop() {
+  if (!discoMode || isMuted) return;
+  const ctx = getCtx();
+  const BPM = 128;
+  const beat = 60 / BPM;       // one beat in seconds
+  const bar  = beat * 4;        // 4 beats = 1 bar
+  const bars = 2;               // loop every 2 bars
+  const loopLen = bar * bars;
+  const t = ctx.currentTime + 0.05;
+
+  // ── Master gain ──
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.55, t);
+  master.connect(ctx.destination);
+  discoMusicNodes.push(master);
+
+  function note(freq, type, start, dur, vol=0.18, detune=0) {
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.connect(g); g.connect(master);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t + start);
+    if (detune) osc.detune.setValueAtTime(detune, t + start);
+    g.gain.setValueAtTime(0, t + start);
+    g.gain.linearRampToValueAtTime(vol, t + start + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + start + dur);
+    osc.start(t + start); osc.stop(t + start + dur + 0.05);
+    discoMusicNodes.push(osc);
+  }
+
+  function kick(start) {
+    // punchy bass drum
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.connect(g); g.connect(master);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, t + start);
+    osc.frequency.exponentialRampToValueAtTime(30, t + start + 0.12);
+    g.gain.setValueAtTime(0.9, t + start);
+    g.gain.exponentialRampToValueAtTime(0.001, t + start + 0.25);
+    osc.start(t + start); osc.stop(t + start + 0.3);
+    discoMusicNodes.push(osc);
+  }
+
+  function snare(start) {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    const g   = ctx.createGain();
+    const flt = ctx.createBiquadFilter();
+    flt.type = 'highpass'; flt.frequency.value = 1200;
+    src.buffer = buf;
+    src.connect(flt); flt.connect(g); g.connect(master);
+    g.gain.setValueAtTime(0.35, t + start);
+    g.gain.exponentialRampToValueAtTime(0.001, t + start + 0.15);
+    src.start(t + start); src.stop(t + start + 0.2);
+    discoMusicNodes.push(src);
+  }
+
+  function hihat(start, vol=0.08) {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    const g   = ctx.createGain();
+    const flt = ctx.createBiquadFilter();
+    flt.type = 'highpass'; flt.frequency.value = 7000;
+    src.buffer = buf;
+    src.connect(flt); flt.connect(g); g.connect(master);
+    g.gain.setValueAtTime(vol, t + start);
+    g.gain.exponentialRampToValueAtTime(0.001, t + start + 0.04);
+    src.start(t + start); src.stop(t + start + 0.06);
+    discoMusicNodes.push(src);
+  }
+
+  // ── DRUMS — 4-on-the-floor kicks + snare on 2&4 + 8th hi-hats ──
+  for (let b = 0; b < bars * 4; b++) {
+    kick(b * beat);                        // kick every beat
+    if (b % 4 === 1 || b % 4 === 3) snare(b * beat + beat * 0.01); // snare 2 & 4
+    for (let h = 0; h < 2; h++) {         // 8th-note hi-hats
+      hihat(b * beat + h * beat * 0.5, b % 2 === 0 ? 0.1 : 0.06);
+    }
+  }
+
+  // ── BASS LINE — funky disco root notes ──
+  const bassLine = [
+    // bar 1
+    [0, 'A2', 130.81, beat*0.45],
+    [beat*0.5, 'A2', 130.81, beat*0.2],
+    [beat*0.75, 'C3', 130.81*1.189, beat*0.2],
+    [beat, 'E2', 82.41, beat*0.45],
+    [beat*1.5, 'E2', 82.41, beat*0.25],
+    [beat*2, 'G2', 98.00, beat*0.45],
+    [beat*2.5, 'A2', 130.81*0.667, beat*0.2],
+    [beat*3, 'D2', 73.42, beat*0.45],
+    [beat*3.5, 'F2', 87.31, beat*0.2],
+    // bar 2
+    [bar, 'A2', 110.00, beat*0.45],
+    [bar+beat*0.5, 'A2', 110.00, beat*0.2],
+    [bar+beat, 'C3', 130.81, beat*0.45],
+    [bar+beat*1.5, 'B2', 123.47, beat*0.2],
+    [bar+beat*2, 'G2', 98.00, beat*0.45],
+    [bar+beat*2.5, 'E2', 82.41, beat*0.2],
+    [bar+beat*3, 'A1', 55.00, beat*0.6],
+    [bar+beat*3.5, 'A1', 55.00, beat*0.35],
+  ];
+  bassLine.forEach(([s,,f,d]) => note(f, 'sawtooth', s, d, 0.22));
+
+  // ── MELODY — disco string / lead riff ──
+  const mel = [
+    [beat*0.5, 880, beat*0.2],
+    [beat*0.75, 1046, beat*0.15],
+    [beat*1, 1174, beat*0.3],
+    [beat*1.5, 1046, beat*0.2],
+    [beat*2, 880, beat*0.2],
+    [beat*2.5, 784, beat*0.25],
+    [beat*3, 659, beat*0.4],
+    [bar+beat*0.5, 784, beat*0.2],
+    [bar+beat*1, 880, beat*0.35],
+    [bar+beat*1.5, 1046, beat*0.2],
+    [bar+beat*2, 1174, beat*0.25],
+    [bar+beat*2.5, 1046, beat*0.18],
+    [bar+beat*3, 880, beat*0.2],
+    [bar+beat*3.5, 659, beat*0.5],
+  ];
+  mel.forEach(([s,f,d]) => {
+    note(f, 'triangle', s, d, 0.11);
+    note(f, 'triangle', s, d, 0.06, 5); // slight detune for chorus effect
+  });
+
+  // ── CHORD STABS — funky off-beat rhythm ──
+  const chords = [
+    [beat*0.75, [220, 277, 330]],   // Am
+    [beat*1.75, [220, 277, 330]],
+    [beat*2.75, [196, 247, 294]],   // Gm
+    [bar+beat*0.75, [220, 277, 330]],
+    [bar+beat*1.75, [246, 311, 369]],// B
+    [bar+beat*2.75, [220, 277, 330]],
+  ];
+  chords.forEach(([s, freqs]) => {
+    freqs.forEach(f => note(f, 'square', s, beat*0.18, 0.07));
+  });
+
+  // Schedule next loop
+  discoMusicLoop = setTimeout(() => {
+    if (discoMode && !isMuted) playDiscoLoop();
+  }, (loopLen - 0.1) * 1000);
+}
+
+function soundFeatherShed() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Whoosh of air
+  playFreqRamp(800, 200, 'sine', 0.25, 0.12, t);
+  playNoise(0.2, 0.08, t);
+}
+
+function soundDeepKO() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Big dramatic KO hit
+  playNoise(0.3, 0.7, t);
+  playFreqRamp(400, 30, 'sine', 0.5, 0.8, t);
+  playFreqRamp(600, 50, 'sawtooth', 0.3, 0.4, t + 0.05);
+  // Flatline beep-boop
+  setTimeout(() => {
+    playTone(440, 'sine', 0.15, 0.3);
+    playTone(220, 'sine', 0.15, 0.3);
+  }, 500);
+  // Final sad bwak
+  setTimeout(() => soundBwak(0.5), 800);
+}
+
+function soundRevive() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Ascending sparkle arpeggio
+  [261, 329, 392, 523, 659, 784].forEach((f, i) => {
+    playTone(f, 'triangle', 0.15, 0.2, t + i * 0.08);
+  });
+  setTimeout(() => soundBwak(1.2), 500);
+}
+
+function soundWakeUp() {
+  const ctx = getCtx(); const t = ctx.currentTime;
+  // Groggy descending then ascending
+  playFreqRamp(300, 150, 'sine', 0.3, 0.15, t);
+  playFreqRamp(150, 400, 'sine', 0.25, 0.15, t + 0.3);
+}
+
+// ── Wire sounds into existing functions ──
+// Patch doAction to call sound
+const _origDoAction = doAction;
+window._soundMap = {
+  punch:  soundPunch,
+  hit:    soundHit,
+  kiss:   soundKiss,
+  hug:    soundHug,
+  pinch:  soundPinch,
+  dance:  soundDisco,
+};
+
+// Override doAction to inject sound
+const __doAction = doAction;
+window.doAction = function(type) {
+  if (window._soundMap[type]) {
+    try { window._soundMap[type](); } catch(e) {}
+  }
+  __doAction(type);
+};
+// Re-bind buttons
+document.querySelectorAll('.action-btn').forEach(btn => {
+  const onclick = btn.getAttribute('onclick');
+  if (onclick) {
+    btn.setAttribute('onclick', onclick.replace('doAction(', 'window.doAction('));
+  }
+});
+// Re-bind chicken click
+document.getElementById('chickenWrap').onclick = function(e) {
+  if (e.target.closest('.action-btn')) return;
+  const acts = ['punch','hit','kiss','hug','pinch'];
+  window.doAction(acts[Math.floor(Math.random() * acts.length)]);
+};
+
+// Patch triggerDeepKO for deep KO sound
+const _origTriggerDeepKO = triggerDeepKO;
+window.triggerDeepKO = function() {
+  try { soundDeepKO(); } catch(e) {}
+  _origTriggerDeepKO();
+  // Patch the revive sound onto the recovery timeout
+  // (we intercept moodText change as signal)
+  const _orig = window._revivePatch;
+};
+
+// Patch feather shed sound
+const _origShed = shedNextFeatherLayer;
+window.shedNextFeatherLayer = function() {
+  try { soundFeatherShed(); } catch(e) {}
+  _origShed();
+};
+
+// Wake-up sound on recovery
+const _origResetDelay = null;
+// Use MutationObserver to detect "Recovering" mood text → play wake sound
+new MutationObserver(() => {
+  const txt = document.getElementById('moodText').textContent;
+  if (txt === 'Recovering') { try { soundWakeUp(); } catch(e) {} }
+  if (txt === 'Revived!')   { try { soundRevive(); } catch(e) {} }
+}).observe(document.getElementById('moodText'), { childList: true, characterData: true, subtree: true });
+
 </script>
 </body>
 </html>
